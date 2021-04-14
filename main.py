@@ -105,7 +105,7 @@ def apply_patch(old_filename: Path, patch_filename: Path, out_filename: Path):
         edit_i = 0
 
         # Параллельно идем по old_data и edits и создаем новый файл
-        # Можно было бы еще все переписать на итераторах, но я не успел
+        # Можно было бы еще все переписать на итераторах, вместо data_i и edit_i, но я не успел
         while data_i < len(old_data) or edit_i < len(edits):
             if edit_i < len(edits) and edits[edit_i].location == data_i:
                 edit = edits[edit_i]
