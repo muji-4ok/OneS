@@ -100,16 +100,16 @@ def apply_patch(old_filename: Path, patch_filename: Path, out_filename: Path):
         edits = [Operation(OpCode(edit_bytes[0]), struct.unpack('I', edit_bytes[1:5])[0], edit_bytes[5]) for edit_bytes
                  in file_iter(patch_file, 6, True)]
 
-        for e in edits:
-            print(e)
-
         old_data = old_file.read()
         data_i = 0
         edit_i = 0
 
+        # Параллельно идем по old_data и edits и создаем новый файл
+        # Можно было бы еще все переписать на итераторах, но я не успел
         while data_i < len(old_data) or edit_i < len(edits):
             if edit_i < len(edits) and edits[edit_i].location == data_i:
                 edit = edits[edit_i]
+
                 if edit.code == OpCode.REPLACE:
                     out_file.write(bytes([edit.new_byte]))
                     data_i += 1
@@ -128,5 +128,6 @@ old_f = Path('test1.txt')
 new_f = Path('test2.txt')
 diff_f = Path('diff.txt')
 out_f = Path('out.txt')
+# Calls not dependent, all diffs are written to disks
 calculate_diff(old_f, new_f, diff_f)
 apply_patch(old_f, diff_f, out_f)
